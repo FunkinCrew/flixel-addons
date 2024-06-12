@@ -1,5 +1,11 @@
 package flixel.addons.weapon;
 
+// TODO: remove this check when min flixel version is 5.6.0,
+// So that FlxAddonDefines will handle this
+#if (flixel < "5.3.0")
+#error "Flixel-Addons is not compatible with flixel versions older than 5.3.0";
+#end
+
 import flixel.FlxBasic;
 import flixel.FlxG;
 import flixel.FlxObject;
@@ -424,16 +430,20 @@ class FlxTypedWeapon<TBullet:FlxBullet>
 		}
 	}
 
-	function shouldBulletHit(Object:FlxObject, Bullet:FlxObject):Bool
+	function shouldBulletHit(object:FlxObject, bullet:FlxObject):Bool
 	{
-		if (parent == Object && skipParentCollision)
+		if (parent == object && skipParentCollision)
 		{
 			return false;
 		}
 
-		if ((Object is FlxTilemap))
+		if ((object is FlxTilemap))
 		{
-			return cast(Object, FlxTilemap).overlapsWithCallback(Bullet);
+			#if (flixel < "5.9.0")
+			return cast(object, FlxTilemap).overlapsWithCallback(bullet);
+			#else
+			return cast(object, FlxTilemap).objectOverlapsTiles(bullet);
+			#end
 		}
 		else
 		{

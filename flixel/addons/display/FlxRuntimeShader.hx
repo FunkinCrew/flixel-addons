@@ -1,6 +1,14 @@
 package flixel.addons.display;
 
-import flixel.system.FlxAssets.FlxShader;
+#if (nme || flash)
+	#if (FLX_NO_COVERAGE_TEST && !(doc_gen))
+		#error "FlxRuntimeShader isn't available with nme or flash."
+	#end
+#else
+import flixel.graphics.tile.FlxGraphicsShader;
+#if lime
+import lime.utils.Float32Array;
+#end
 import openfl.display.BitmapData;
 import openfl.display.ShaderInput;
 import openfl.display.ShaderParameter;
@@ -21,7 +29,7 @@ import openfl.display.ShaderParameter;
  * @see https://github.com/openfl/openfl/blob/develop/src/openfl/utils/_internal/ShaderMacro.hx
  * @see https://dixonary.co.uk/blog/shadertoy
  */
-class FlxRuntimeShader extends FlxShader
+class FlxRuntimeShader extends FlxGraphicsShader
 {
 	#if FLX_DRAW_QUADS
 	// We need to add stuff from FlxGraphicsShader too!
