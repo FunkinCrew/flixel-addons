@@ -6,6 +6,7 @@ package flixel.addons.display;
 	#end
 #else
 import flixel.graphics.tile.FlxGraphicsShader;
+#end
 #if lime
 import lime.utils.Float32Array;
 #end
