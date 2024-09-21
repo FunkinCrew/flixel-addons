@@ -25,6 +25,11 @@ class FlxTrail extends #if (flixel < "5.7.0") FlxSpriteGroup #else FlxSpriteCont
 	public var target(default, null):FlxSprite;
 
 	/**
+	 * Useful if you need to have more granular control over per-sprite offsetting.
+	 */
+	public var effectOffset(default, null):FlxPoint = FlxPoint.get();
+
+	/**
 	 * How often to update the trail.
 	 */
 	public var delay:Int;
@@ -140,10 +145,16 @@ class FlxTrail extends #if (flixel < "5.7.0") FlxSpriteGroup #else FlxSpriteCont
 		super.destroy();
 	}
 
+	override public function update(elapsed:Float):Void
+	{
+		updateTrail();
+		super.update(elapsed);
+	}
+
 	/**
 	 * Updates positions and other values according to the delay that has been set.
 	 */
-	override public function update(elapsed:Float):Void
+	public function updateTrail():Void
 	{
 		// Count the frames
 		_counter++;
@@ -164,7 +175,7 @@ class FlxTrail extends #if (flixel < "5.7.0") FlxSpriteGroup #else FlxSpriteCont
 				spritePosition = FlxPoint.get();
 			}
 
-			spritePosition.set(target.x - target.offset.x, target.y - target.offset.y);
+			spritePosition.set(target.x - target.offset.x - effectOffset.x, target.y - target.offset.y - effectOffset.y);
 			_recentPositions.unshift(spritePosition);
 
 			// Also do the same thing for the Sprites angle if rotationsEnabled
@@ -238,7 +249,6 @@ class FlxTrail extends #if (flixel < "5.7.0") FlxSpriteGroup #else FlxSpriteCont
 			}
 		}
 
-		super.update(elapsed);
 	}
 
 	function cacheValue<T>(array:Array<T>, value:T)
