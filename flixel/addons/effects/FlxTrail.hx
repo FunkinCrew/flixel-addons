@@ -145,18 +145,12 @@ class FlxTrail extends #if (flixel < "5.7.0") FlxSpriteGroup #else FlxSpriteCont
 		super.destroy();
 	}
 
-	override public function update(elapsed:Float):Void
-	{
-		updateTrail();
-		super.update(elapsed);
-	}
-
 	/**
 	 * Updates positions and other values according to the delay that has been set.
 	 */
-	public function updateTrail():Void
+	override public function update(elapsed:Float):Void
 	{
-		// Count the frames
+		 // Count the frames
 		_counter++;
 
 		// Update the trail in case the intervall and there actually is one.
@@ -249,6 +243,7 @@ class FlxTrail extends #if (flixel < "5.7.0") FlxSpriteGroup #else FlxSpriteCont
 			}
 		}
 
+		super.update(elapsed);
 	}
 
 	function cacheValue<T>(array:Array<T>, value:T)
