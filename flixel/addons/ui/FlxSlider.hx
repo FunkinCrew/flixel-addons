@@ -274,7 +274,7 @@ class FlxSlider extends #if (flixel < "5.7.0") FlxSpriteGroup #else FlxSpriteCon
 		#if (flixel >= "5.7.0")
 		final camera = getCameras()[0];// else use this.camera
 		#end
-		final mouse = FlxG.mouse.getScreenPosition(camera);
+		final mouse = FlxG.mouse.getViewPosition(camera);
 		if (FlxMath.pointInFlxRect(mouse.x, mouse.y, _bounds))
 		{
 			if (hoverAlpha != 1)
@@ -293,7 +293,7 @@ class FlxSlider extends #if (flixel < "5.7.0") FlxSpriteGroup #else FlxSpriteCon
 
 			if (FlxG.mouse.pressed)
 			{
-				handle.x = FlxG.mouse.screenX;
+				handle.x = FlxG.mouse.viewX;
 				updateValue();
 
 				#if FLX_SOUND_SYSTEM
