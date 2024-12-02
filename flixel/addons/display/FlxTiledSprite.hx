@@ -219,7 +219,7 @@ class FlxTiledSprite extends FlxStrip
 
 	function updateVerticesData():Void
 	{
-		if (graphic == null)
+		if (graphic == null || graphic.imageFrame == null)
 			return;
 
 		var frame:FlxFrame = graphic.imageFrame.frame;
