@@ -143,7 +143,7 @@ class FlxTransitionSprite extends FlxSprite
 		}
 
 		animation.play(anim);
-		animation.finishCallback = onFinishAnim;
+		animation.onFinish.add(onFinishAnim);
 		status = Status;
 	}
 
