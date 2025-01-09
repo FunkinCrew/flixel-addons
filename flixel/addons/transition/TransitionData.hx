@@ -13,6 +13,7 @@ enum abstract TransitionType(String)
 	var NONE = "none";
 	var TILES = "tiles";
 	var FADE = "fade";
+	var CUSTOM = "custom";
 }
 
 /**
@@ -23,10 +24,10 @@ enum TransitionCameraMode
 {
 	/** The transition will use the current top-most camera, this is the default value */
 	TOP;
-	
+
 	/** The transition will create and use a new camera above all others */
 	NEW;
-	
+
 	/** The transition will use the default cameras */
 	DEFAULT;
 }
@@ -44,33 +45,36 @@ typedef TransitionTileData =
  */
 class TransitionData implements IFlxDestroyable
 {
-	/** `NONE`, `TILE`, or `FADE` */
+	/** `NONE`, `TILE`, `FADE`, or `CUSTOM` */
 	public var type:TransitionType;
-	
+
+	/** The transition state to use, when `CUSTOM` type is used */
+	public var transitionState:Transition;
+
 	/** The graphic to tile, when `TILE` type is used */
 	public var tileData:TransitionTileData;
-	
+
 	/** The color of the transition */
 	public var color:FlxColor;
-	
+
 	/** How long the transition will take */
 	public var duration:Float = 1.0;
-	
+
 	/** Add a "wipe" effect to various transition styles */
 	public var direction:FlxPoint;
-	
+
 	/** Used to override the options of the tween controlling this transtition */
 	public var tweenOptions:TweenOptions;
-	
+
 	/** The area of the screen to display the transition */
 	public var region:FlxRect;
-	
+
 	/**
 	 * Whether this transition will use a new camera, the top camera, or the default camera
 	 * @since 3.3.0
 	 */
 	public var cameraMode:TransitionCameraMode = TOP;
-	
+
 	public function destroy():Void
 	{
 		tileData = null;
@@ -78,21 +82,23 @@ class TransitionData implements IFlxDestroyable
 		tweenOptions = null;
 		region = null;
 		direction = null;
+		transitionState = null;
 	}
-	
+
 	/**
 	 * Used to define a transition for `FlxTransitionableState`
-	 * 
-	 * @param type          `NONE`, `TILE`, or `FADE`
-	 * @param color         The color of the transition
-	 * @param duration      How long the transition will take
-	 * @param direction     Add a "wipe" effect to various transition styles
-	 * @param tileData      The graphic to tile, when `TILE` type is used
-	 * @param region        The area of the screen to display the transition
-	 * @param cameraMode    Whether this transition will use a new camera, the top camera, or the default camera
+	 *
+	 * @param type          	`NONE`, `TILE`, or `FADE`
+	 * @param color         	The color of the transition
+	 * @param duration      	How long the transition will take
+	 * @param direction     	Add a "wipe" effect to various transition styles
+	 * @param tileData      	The graphic to tile, when `TILE` type is used
+	 * @param region        	The area of the screen to display the transition
+	 * @param cameraMode    	Whether this transition will use a new camera, the top camera, or the default camera
+	 * @param transitionState The state to transition with, when `CUSTOM` type is used
 	 */
 	public function new(type = FADE, color = FlxColor.WHITE, duration = 1.0, ?direction:FlxPoint, ?tileData:TransitionTileData, ?region:FlxRect,
-			cameraMode = TOP)
+			cameraMode = TOP, ?transitionState:Transition)
 	{
 		this.type = type;
 		this.tileData = tileData;
@@ -115,5 +121,6 @@ class TransitionData implements IFlxDestroyable
 		}
 		this.region = region;
 		this.cameraMode = cameraMode;
+		this.transitionState = transitionState;
 	}
 }

@@ -33,15 +33,8 @@ import flixel.FlxState;
  * FlxG.switchState(new FooState());
  * ```
  */
-class FlxTransitionableState extends FlxState
+class FlxTransitionableSubState extends FlxSubState
 {
-	// global default transitions for ALL states, used if transIn/transOut are null
-	public static var defaultTransIn:TransitionData = null;
-	public static var defaultTransOut:TransitionData = null;
-
-	public static var skipNextTransIn:Bool = false;
-	public static var skipNextTransOut:Bool = false;
-
 	// beginning & ending transitions for THIS state:
 	public var transIn:TransitionData;
 	public var transOut:TransitionData;
@@ -59,13 +52,13 @@ class FlxTransitionableState extends FlxState
 		transIn = TransIn;
 		transOut = TransOut;
 
-		if (transIn == null && defaultTransIn != null)
+		if (transIn == null && FlxTransitionableState.defaultTransIn != null)
 		{
-			transIn = defaultTransIn;
+			transIn = FlxTransitionableState.defaultTransIn;
 		}
-		if (transOut == null && defaultTransOut != null)
+		if (transOut == null && FlxTransitionableState.defaultTransOut != null)
 		{
-			transOut = defaultTransOut;
+			transOut = FlxTransitionableState.defaultTransOut;
 		}
 		super();
 	}
@@ -94,9 +87,9 @@ class FlxTransitionableState extends FlxState
 			_exiting = true;
 			transitionOut(onOutroComplete);
 
-			if (skipNextTransOut)
+			if (FlxTransitionableState.skipNextTransOut)
 			{
-				skipNextTransOut = false;
+				FlxTransitionableState.skipNextTransOut = false;
 				finishTransOut();
 			}
 		}
@@ -109,9 +102,9 @@ class FlxTransitionableState extends FlxState
 	{
 		if (transIn != null && transIn.type != NONE)
 		{
-			if (skipNextTransIn)
+			if (FlxTransitionableState.skipNextTransIn)
 			{
-				skipNextTransIn = false;
+				FlxTransitionableState.skipNextTransIn = false;
 				if (finishTransIn != null)
 				{
 					finishTransIn();
