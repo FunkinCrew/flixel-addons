@@ -16,7 +16,7 @@ import flixel.util.FlxSpriteUtil;
  * A slider GUI element for float and integer manipulation.
  * @author Gama11
  */
-class FlxSlider extends #if (flixel < "5.7.0") FlxSpriteGroup #else FlxSpriteContainer #end
+class FlxSlider extends #if (flixel < version("5.7.0")) FlxSpriteGroup #else FlxSpriteContainer #end
 {
 	/**
 	 * The horizontal line in the background.
@@ -271,11 +271,17 @@ class FlxSlider extends #if (flixel < "5.7.0") FlxSpriteGroup #else FlxSpriteCon
 	override public function update(elapsed:Float):Void
 	{
 		// Clicking and sound logic
-		#if (flixel >= "5.7.0")
+		#if (flixel >= version("5.7.0"))
 		final camera = getCameras()[0];// else use this.camera
 		#end
-		final mouse = FlxG.mouse.getViewPosition(camera);
-		if (FlxMath.pointInFlxRect(mouse.x, mouse.y, _bounds))
+		#if (flixel >= version("5.9.0"))
+		final viewX = FlxG.mouse.viewX;
+		final viewY = FlxG.mouse.viewY;
+		#else
+		final viewX = FlxG.mouse.screenX;
+		final viewY = FlxG.mouse.screenY;
+		#end
+		if (FlxMath.pointInFlxRect(viewX, viewY, _bounds))
 		{
 			if (hoverAlpha != 1)
 			{
@@ -293,7 +299,7 @@ class FlxSlider extends #if (flixel < "5.7.0") FlxSpriteGroup #else FlxSpriteCon
 
 			if (FlxG.mouse.pressed)
 			{
-				handle.x = FlxG.mouse.viewX;
+				handle.x = viewX;
 				updateValue();
 
 				#if FLX_SOUND_SYSTEM
