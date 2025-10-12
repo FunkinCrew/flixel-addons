@@ -105,20 +105,19 @@ class FlxTiledSprite extends FlxStrip
 		graphic = FlxGraphic.fromFrame(frame);
 		return this;
 	}
-
-	override function set_clipRect(Value:FlxRect):FlxRect
+	
+	override function set_clipRect(value:FlxRect):FlxRect
 	{
-		if (Value != clipRect)
-			regen = true;
-
-		return super.set_clipRect(Value);
+		regen = true;
+		
+		return super.set_clipRect(value);
 	}
-
-	override function set_graphic(Value:FlxGraphic):FlxGraphic
+	
+	override function set_graphic(value:FlxGraphic):FlxGraphic
 	{
 		if (graphic != value)
 			regen = true;
-		
+			
 		return super.set_graphic(value);
 	}
 	
@@ -126,7 +125,7 @@ class FlxTiledSprite extends FlxStrip
 	{
 		if (!regen || graphic == null)
 			return;
-		
+			
 		if (FlxG.renderBlit)
 		{
 			updateRenderSprite();
@@ -143,7 +142,7 @@ class FlxTiledSprite extends FlxStrip
 	{
 		if (regen)
 			regenGraphic();
-		
+			
 		if (graphicVisible)
 		{
 			if (FlxG.renderBlit)
@@ -174,7 +173,7 @@ class FlxTiledSprite extends FlxStrip
 	{
 		if (ignoreDrawDebug)
 			return;
-		
+			
 		final drawPath = path != null && !path.ignoreDrawDebug;
 		
 		for (camera in getCamerasLegacy())
@@ -195,13 +194,13 @@ class FlxTiledSprite extends FlxStrip
 		
 		if (renderSprite == null)
 			renderSprite = new FlxSprite();
-		
+			
 		final drawRect = getDrawRect();
 		drawRect.x = Std.int(drawRect.x);
 		drawRect.y = Std.int(drawRect.y);
 		drawRect.width = Std.int(drawRect.width);
 		drawRect.height = Std.int(drawRect.height);
-		//TODO: rect.int() or smth
+		// TODO: rect.int() or smth
 		
 		if (drawRect.width * drawRect.height == 0)
 		{
@@ -243,61 +242,96 @@ class FlxTiledSprite extends FlxStrip
 	{
 		if (graphic == null)
 			return;
-		
+			
 		final frame:FlxFrame = graphic.imageFrame.frame;
 		graphicVisible = true;
-
-		var rectX:Float = (repeatX ? 0 : scrollX);
-		rectX = FlxMath.bound(rectX, 0, width);
-		if (clipRect != null) rectX += clipRect.x;
-
-		var rectWidth:Float = (repeatX ? rectX + width : scrollX + frame.sourceSize.x);
-		if (clipRect != null) rectWidth = FlxMath.bound(rectWidth, clipRect.x, clipRect.x + clipRect.width);
-
+		
+		final drawRect = getDrawRect();
+		
+		if (drawRect.width * drawRect.height == 0)
+		{
+			graphicVisible = false;
+			drawRect.put();
+			return;
+		}
+		
 		// Texture coordinates (UVs)
-		var rectUX:Float = (rectX - scrollX) / frame.sourceSize.x;
-		var rectVX:Float = rectUX + (rectWidth-rectX) / frame.sourceSize.x;
-
-		vertices[0] = rectX;
-		vertices[2] = rectWidth;
-		vertices[4] = rectWidth;
-		vertices[6] = rectX;
-
+		final rectUX:Float = (drawRect.x - scrollX) / frame.sourceSize.x;
+		final rectVX:Float = rectUX + (drawRect.width - drawRect.x) / frame.sourceSize.x;
+		final rectUY:Float = (drawRect.y - scrollY) / frame.sourceSize.y;
+		final rectVY:Float = rectUY + (drawRect.height - drawRect.y) / frame.sourceSize.y;
+		
+		vertices[0] = drawRect.x;
+		vertices[2] = drawRect.width;
+		vertices[4] = drawRect.width;
+		vertices[6] = drawRect.x;
+		
 		uvtData[0] = rectUX;
 		uvtData[2] = rectVX;
 		uvtData[4] = rectVX;
 		uvtData[6] = rectUX;
-
-		var rectY:Float = (repeatY ? 0 : scrollY);
-		rectY = FlxMath.bound(rectY, 0, height);
-		if (clipRect != null) rectY += clipRect.y;
-
-		var rectHeight:Float = (repeatY ? rectY + height : scrollY + frame.sourceSize.y);
-		if (clipRect != null) rectHeight = FlxMath.bound(rectHeight, clipRect.y, clipRect.y + clipRect.height);
-
-		// Texture coordinates (UVs)
-		var rectUY:Float = (rectY - scrollY) / frame.sourceSize.y;
-		var rectVY:Float = rectUY + (rectHeight-rectY) / frame.sourceSize.y;
-
-		vertices[1] = rectY;
-		vertices[3] = rectY;
-		vertices[5] = rectHeight;
-		vertices[7] = rectHeight;
-
+		
+		vertices[1] = drawRect.y;
+		vertices[3] = drawRect.y;
+		vertices[5] = drawRect.height;
+		vertices[7] = drawRect.height;
+		
 		uvtData[1] = rectUY;
 		uvtData[3] = rectUY;
 		uvtData[5] = rectVY;
 		uvtData[7] = rectVY;
+		
+		drawRect.put();
 	}
-
-	override function set_width(Width:Float):Float
+	
+	function getDrawRect(?result:FlxRect):FlxRect
+	{
+		if (result == null)
+			result = FlxRect.get();
+			
+		final frame:FlxFrame = graphic.imageFrame.frame;
+		final sourceSizeX = FlxG.renderBlit ? graphic.bitmap.width : frame.sourceSize.x;
+		final sourceSizeY = FlxG.renderBlit ? graphic.bitmap.height : frame.sourceSize.y;
+		
+		result.x = (repeatX ? 0 : scrollX);
+		if (clipRect != null)
+		{
+			result.x += clipRect.x;
+		}
+		result.x = FlxMath.bound(result.x, 0, width);
+		
+		result.width = (repeatX ? result.x + width : scrollX + sourceSizeX);
+		if (clipRect != null)
+		{
+			result.width = FlxMath.bound(result.width, clipRect.x, clipRect.right);
+		}
+		result.width = FlxMath.bound(result.width, 0, width);
+		
+		result.y = (repeatY ? 0 : scrollY);
+		if (clipRect != null)
+		{
+			result.y += clipRect.y;
+		}
+		result.y = FlxMath.bound(result.y, 0, height);
+		
+		result.height = (repeatY ? result.y + height : scrollY + sourceSizeY);
+		if (clipRect != null)
+		{
+			result.height = FlxMath.bound(result.height, clipRect.y, clipRect.bottom);
+		}
+		result.height = FlxMath.bound(result.height, 0, height);
+		
+		return result;
+	}
+	
+	override function set_width(value:Float):Float
 	{
 		if (value <= 0)
 			return value;
-		
+			
 		if (value != width)
 			regen = true;
-		
+			
 		return super.set_width(value);
 	}
 	
@@ -305,10 +339,10 @@ class FlxTiledSprite extends FlxStrip
 	{
 		if (value <= 0)
 			return value;
-		
+			
 		if (value != height)
 			regen = true;
-		
+			
 		return super.set_height(value);
 	}
 	
@@ -316,7 +350,7 @@ class FlxTiledSprite extends FlxStrip
 	{
 		if (value != scrollX)
 			regen = true;
-		
+			
 		return scrollX = value;
 	}
 	
@@ -324,7 +358,7 @@ class FlxTiledSprite extends FlxStrip
 	{
 		if (value != scrollY)
 			regen = true;
-		
+			
 		return scrollY = value;
 	}
 	
@@ -332,7 +366,7 @@ class FlxTiledSprite extends FlxStrip
 	{
 		if (value != repeatX)
 			regen = true;
-		
+			
 		return repeatX = value;
 	}
 	
@@ -340,7 +374,7 @@ class FlxTiledSprite extends FlxStrip
 	{
 		if (value != repeatY)
 			regen = true;
-		
+			
 		return repeatY = value;
 	}
 }
