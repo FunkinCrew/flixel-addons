@@ -16,7 +16,7 @@ import flixel.util.FlxSpriteUtil;
  * A slider GUI element for float and integer manipulation.
  * @author Gama11
  */
-class FlxSlider extends #if (flixel < "5.7.0") FlxSpriteGroup #else FlxSpriteContainer #end
+class FlxSlider extends #if (flixel < version("5.7.0")) FlxSpriteGroup #else FlxSpriteContainer #end
 {
 	/**
 	 * The horizontal line in the background.
@@ -272,10 +272,13 @@ class FlxSlider extends #if (flixel < "5.7.0") FlxSpriteGroup #else FlxSpriteCon
 	{
 		// Clicking and sound logic
 		#if (flixel >= "5.7.0")
-		final camera = getCameras()[0];// else use this.camera
+		final cam = getDefaultCamera();
+		#else
+		final cam = this.camera;
 		#end
-		final mouse = FlxG.mouse.getScreenPosition(camera);
-		if (FlxMath.pointInFlxRect(mouse.x, mouse.y, _bounds))
+		final mousePosition = FlxG.mouse.getViewPosition(cam);
+		
+		if (FlxMath.pointInFlxRect(mousePosition.x, mousePosition.y, _bounds))
 		{
 			if (hoverAlpha != 1)
 			{
@@ -293,7 +296,7 @@ class FlxSlider extends #if (flixel < "5.7.0") FlxSpriteGroup #else FlxSpriteCon
 
 			if (FlxG.mouse.pressed)
 			{
-				handle.x = FlxG.mouse.screenX;
+				handle.x = mousePosition.x;
 				updateValue();
 
 				#if FLX_SOUND_SYSTEM
@@ -320,7 +323,7 @@ class FlxSlider extends #if (flixel < "5.7.0") FlxSpriteGroup #else FlxSpriteCon
 		}
 
 		// Update the target value whenever the slider is being used
-		if ((FlxG.mouse.pressed) && (FlxMath.mouseInFlxRect(false, _bounds)))
+		if ((FlxG.mouse.pressed) && (FlxMath.pointInFlxRect(mousePosition.x, mousePosition.y, _bounds)))
 		{
 			updateValue();
 		}
@@ -339,6 +342,9 @@ class FlxSlider extends #if (flixel < "5.7.0") FlxSpriteGroup #else FlxSpriteCon
 
 		// Finally, update the valueLabel
 		valueLabel.text = Std.string(FlxMath.roundDecimal(value, decimals));
+
+		mousePosition.put();
+
 
 		super.update(elapsed);
 	}

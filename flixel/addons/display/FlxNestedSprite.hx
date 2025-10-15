@@ -1,6 +1,5 @@
 package flixel.addons.display;
 
-import openfl.geom.ColorTransform;
 import flixel.FlxBasic;
 import flixel.FlxG;
 import flixel.FlxSprite;
@@ -11,6 +10,8 @@ import flixel.math.FlxVelocity;
 import flixel.system.FlxAssets.FlxGraphicAsset;
 import flixel.util.FlxColor;
 import flixel.util.FlxDestroyUtil;
+import flixel.util.FlxDirectionFlags;
+import openfl.geom.ColorTransform;
 
 using flixel.util.FlxArrayUtil;
 
@@ -296,6 +297,7 @@ class FlxNestedSprite extends FlxSprite
 			var green:Float = (color >> 8 & 0xff) * _parentGreen / 255;
 			var blue:Float = (color & 0xff) * _parentBlue / 255;
 
+			#if (flixel < version("6.1.0"))
 			if (colorTransform == null)
 			{
 				colorTransform = new ColorTransform(red, green, blue, alpha);
@@ -308,9 +310,16 @@ class FlxNestedSprite extends FlxSprite
 				colorTransform.alphaMultiplier = alpha;
 			}
 			useColorTransform = true;
+			#else
+			colorTransform.redMultiplier = red;
+			colorTransform.greenMultiplier = green;
+			colorTransform.blueMultiplier = blue;
+			colorTransform.alphaMultiplier = alpha;
+			#end
 		}
 		else
 		{
+			#if (flixel < version("6.1.0"))
 			if (colorTransform != null)
 			{
 				colorTransform.redMultiplier = 1;
@@ -319,6 +328,12 @@ class FlxNestedSprite extends FlxSprite
 				colorTransform.alphaMultiplier = 1;
 			}
 			useColorTransform = false;
+			#else
+			colorTransform.redMultiplier = 1;
+			colorTransform.greenMultiplier = 1;
+			colorTransform.blueMultiplier = 1;
+			colorTransform.alphaMultiplier = 1;
+			#end
 		}
 		dirty = true;
 
@@ -333,7 +348,7 @@ class FlxNestedSprite extends FlxSprite
 
 	override function set_color(Color:FlxColor):FlxColor
 	{
-		Color = Color.to24Bit();
+		Color = Color.rgb;
 
 		var combinedRed:Float = (Color >> 16) * _parentRed / 255;
 		var combinedGreen:Float = (Color >> 8 & 0xff) * _parentGreen / 255;
@@ -347,6 +362,7 @@ class FlxNestedSprite extends FlxSprite
 		color = combinedColor;
 		if ((alpha != 1) || (color != 0x00ffffff))
 		{
+			#if (flixel < version("6.1.0"))
 			if (colorTransform == null)
 			{
 				colorTransform = new ColorTransform(combinedRed, combinedGreen, combinedBlue, alpha);
@@ -359,9 +375,16 @@ class FlxNestedSprite extends FlxSprite
 				colorTransform.alphaMultiplier = alpha;
 			}
 			useColorTransform = true;
+			#else
+			colorTransform.redMultiplier = combinedRed;
+			colorTransform.greenMultiplier = combinedGreen;
+			colorTransform.blueMultiplier = combinedBlue;
+			colorTransform.alphaMultiplier = alpha;
+			#end
 		}
 		else
 		{
+			#if (flixel < version("6.1.0"))
 			if (colorTransform != null)
 			{
 				colorTransform.redMultiplier = 1;
@@ -370,6 +393,12 @@ class FlxNestedSprite extends FlxSprite
 				colorTransform.alphaMultiplier = 1;
 			}
 			useColorTransform = false;
+			#else
+			colorTransform.redMultiplier = 1;
+			colorTransform.greenMultiplier = 1;
+			colorTransform.blueMultiplier = 1;
+			colorTransform.alphaMultiplier = 1;
+			#end
 		}
 
 		dirty = true;
@@ -401,7 +430,7 @@ class FlxNestedSprite extends FlxSprite
 		return color;
 	}
 
-	override function set_facing(Direction:Int):Int
+	override function set_facing(Direction:FlxDirectionFlags):FlxDirectionFlags
 	{
 		super.set_facing(Direction);
 		if (children != null)
