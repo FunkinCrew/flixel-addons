@@ -25,41 +25,43 @@ import flixel.util.FlxTimer;
 class Transition extends FlxSubState
 {
 	public var finishCallback(get, set):Void->Void;
-	
+
 	var _effect:TransitionEffect;
-	
+
 	public function new(data:TransitionData)
 	{
 		super(FlxColor.TRANSPARENT);
-		
+
 		_effect = createEffect(data);
 		_effect.scrollFactor.set(0, 0);
 		add(_effect);
 	}
-	
+
 	public override function destroy():Void
 	{
 		super.destroy();
-		
+
 		finishCallback = null;
-		
+
 		_effect = FlxDestroyUtil.destroy(_effect);
 	}
-	
+
 	public function start(newStatus:TransitionStatus):Void
 	{
 		_effect.start(newStatus);
 	}
-	
+
 	public function setStatus(newStatus:TransitionStatus):Void
 	{
 		_effect.setStatus(newStatus);
 	}
-	
+
 	function createEffect(data:TransitionData):TransitionEffect
 	{
 		switch (data.type)
 		{
+			case TransitionType.CUSTOM:
+				return new TransitionEffect(data);
 			case TransitionType.TILES:
 				return new TransitionTiles(data);
 			case TransitionType.FADE:
@@ -68,26 +70,26 @@ class Transition extends FlxSubState
 				throw "Unexpected TransitionType: NONE";
 		}
 	}
-	
+
 	function get_finishCallback():Void->Void
 	{
 		if (_effect != null)
 		{
 			return _effect.finishCallback;
 		}
-		
+
 		return null;
 	}
-	
+
 	function set_finishCallback(callback:Void->Void):Void->Void
 	{
 		if (_effect != null)
 		{
 			_effect.finishCallback = callback;
-			
+
 			return callback;
 		}
-		
+
 		return null;
 	}
 }
