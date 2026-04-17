@@ -1,7 +1,5 @@
 package flixel.addons.transition;
 
-package flixel.addons.transition;
-
 // TODO: remove this check when min flixel version is 5.6.0,
 // So that FlxAddonDefines will handle this
 #if (flixel < "5.3.0")
