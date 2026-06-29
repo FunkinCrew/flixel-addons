@@ -93,7 +93,7 @@ class FlxTransitionableState extends FlxState
 			// play the exit transition, and when it's done call FlxG.switchState
 			_exiting = true;
 			transitionOut(onOutroComplete);
-			
+
 			if (skipNextTransOut)
 			{
 				skipNextTransOut = false;
@@ -120,12 +120,14 @@ class FlxTransitionableState extends FlxState
 			}
 
 			var _trans = createTransition(transIn);
+			if (_trans != null)
+			{
+				_trans.setStatus(FULL);
+				openSubState(_trans);
 
-			_trans.setStatus(FULL);
-			openSubState(_trans);
-
-			_trans.finishCallback = finishTransIn;
-			_trans.start(OUT);
+				_trans.finishCallback = finishTransIn;
+				_trans.start(OUT);
+			}
 		}
 	}
 
