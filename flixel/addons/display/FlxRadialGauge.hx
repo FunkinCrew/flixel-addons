@@ -23,7 +23,7 @@ class FlxRadialGauge extends FlxSprite
 	{
 		return _sweepShader.amount = value;
 	}
-	
+
 	/** The angle in degrees to start the dial fill */
 	public var start(get, set):Float;
 	inline function get_start():Float
@@ -34,7 +34,7 @@ class FlxRadialGauge extends FlxSprite
 	{
 		return _sweepShader.start = value;
 	}
-	
+
 	/** The angle in degrees to end the dial fill */
 	public var end(get, set):Float;
 	inline function get_end():Float
@@ -45,24 +45,24 @@ class FlxRadialGauge extends FlxSprite
 	{
 		return _sweepShader.end = value;
 	}
-	
+
 	var _sweepShader(get, never):FlxRadialWipeShader;
 	inline function get__sweepShader() return cast shader;
-	
+
 	public function new(x = 0.0, y = 0.0, ?simpleGraphic)
 	{
 		super(x, y, simpleGraphic);
-		
+
 		shader = new FlxRadialWipeShader();
 		this.amount = 1;
 	}
-	
+
 	public function makeShapeGraphic(shape:FlxRadialGaugeShape, radius:Int, innerRadius = 0, color = FlxColor.WHITE)
 	{
 		final graphic = FlxPieDialUtils.getRadialGaugeGraphic(shape, radius, innerRadius, color);
 		loadGraphic(graphic, true, radius * 2, radius * 2);
 	}
-	
+
 	public function setOrientation(start = -90.0, end = 270.0)
 	{
 		this.start = start;
@@ -85,7 +85,7 @@ class FlxRadialWipeShader extends flixel.system.FlxAssets.FlxShader
 		_amount.value = [value];
 		return value;
 	}
-	
+
 	/** The angle in degrees to start the dial fill */
 	public var start(get, set):Float;
 	inline function get_start():Float return _start.value[0];
@@ -94,7 +94,7 @@ class FlxRadialWipeShader extends flixel.system.FlxAssets.FlxShader
 		_start.value = [value];
 		return value;
 	}
-	
+
 	/** The angle in degrees to end the dial fill */
 	public var end(get, set):Float;
 	inline function get_end():Float return _end.value[0];
@@ -103,16 +103,16 @@ class FlxRadialWipeShader extends flixel.system.FlxAssets.FlxShader
 		_end.value = [value];
 		return value;
 	}
-	
+
 	@:glFragmentSource('
 		#pragma header
-		
+
 		const float TAU = 6.2831853072;
-		
+
 		uniform float _amount;
 		uniform float _start;
 		uniform float _end;
-		
+
 		float getGradiant(in vec2 dist)
 		{
 			float start = _start / 360.0;
@@ -123,21 +123,21 @@ class FlxRadialWipeShader extends flixel.system.FlxAssets.FlxShader
 			else
 				return mod(start - angle, 1.0) / -delta;
 		}
-		
+
 		float wedge(in vec2 uv, in float ratio)
 		{
 			vec2 dist = uv - vec2(0.5);
 			float grad = getGradiant(dist);
 			return step(ratio, grad < 0.0 ? 1.0 : grad);
 		}
-		
+
 		void main()
 		{
 			if (_amount > 0.0)
 			{
 				float amount = min(1.0, max(0.0, _amount));
-				vec4 bitmap = flixel_texture2D(bitmap, openfl_TextureCoordv);
-				gl_FragColor = mix(bitmap, vec4(0.0), wedge(openfl_TextureCoordv, amount));
+				vec4 color = flixel_texture2D(bitmap, openfl_TextureCoordv);
+				gl_FragColor = mix(color, vec4(0.0), wedge(openfl_TextureCoordv, amount));
 			}
 			else
 				gl_FragColor = vec4(0.0);
